@@ -1,8 +1,15 @@
 body {
+    background-color: powderblue;`
 }
 
 h1 {
+  color: blue;
+  font-family: courier;
+  font-size: 200%;
 }
 
 p {
+  color: red;
+  font-family: courier;
+  font-size: 100%;
 }
