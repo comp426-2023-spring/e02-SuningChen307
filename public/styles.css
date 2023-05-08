@@ -2,6 +2,10 @@ body {
     background-color: powderblue;
 }
 
+.title {
+  text-align: center;
+}
+
 h1 {
   color: blue;
   font-family: courier;
