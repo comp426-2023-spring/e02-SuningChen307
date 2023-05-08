@@ -1,51 +1,95 @@
-// If you would like to see some examples of similar code to make an interface interact with an API, 
+// If you would like to see some examples of similar code to make an interface interact with an API,
 // check out the coin-server example from a previous COMP 426 semester.
 // https://github.com/jdmar3/coinserver
 
-function showHideShots() {
-// Get the info from the checkbox
-  	let check = document.getElementById('opponent');
-// Check if the checkbox is checked and show or hide options accordingly
-	if (check.checked == true) {
-// Here, instead of just showing all of the options, use similar logic to 
-// check which of the game radio buttons is checked and show only those
-// options relevant to the game being selected (rps or rpsls). You can 
-// use similar jQuery 
-		$('.shots').show()
-	} else {
-		$('.shots').hide()
-	}
-}
-// This function clears the input form and also resets the shot selection
-// radio buttons. 
-function startOver () {
-	document.getElementById('userinput').reset();
+document.addEventListener("DOMContentLoaded", () => {
 	showHideShots();
-}
-
-async function playGame () {
-	// Get which game is being played based on the value in the form
-	let game = $('input[type=radio][name=game]:checked').val();
-	// Get which shot is being played based on the value in the form
-	let shot = $('input[type=radio][name=shot]:checked').val();
-	// Identify the base URL based on browser information
-	let baseurl = window.location.href + 'app/'
-	// Log the base URL
-	console.log(baseurl)
-	// This constructs a URL for the opponent option ONLY. To incorporate
-	// the other option, you can use a conditional to change the URL based
-	// on what is selected. You could also write separate functions, or use
-	// a conditional somewhere above in this function to construct the 
-	// correct URL
-	let url = baseurl + game + '/play/' + shot
-    // Log the full URL
-	console.log(url)	
-
-	let response = await fetch(url)
-	let result = await response.json()
-	// Log the result
-	console.log(result)
-	// Here you should include code that uses the DOM API or jQuery to 
-	// manipulate another block of HTML in the interface to display the 
-	// results in some way. 
-}
+  });
+  
+  function showHideShots() {
+	const opponentCheckbox = document.getElementById("opponent");
+	const rpsRadios = document.querySelectorAll(".rps");
+	const rpslsRadios = document.querySelectorAll(".rpsls");
+	const gameType = document.querySelector('input[name="game"]:checked').value;
+  
+	if (opponentCheckbox.checked) {
+	  chooseMoveText.innerHTML = `
+		<br/><br/>
+		Now choose your next move!
+		<br><br>
+	  `;
+	  if (gameType === "rps") {
+		rpsRadios.forEach((radio) => {
+		  radio.style.display = "inline";
+		});
+		rpslsRadios.forEach((radio) => {
+		  radio.style.display = "none";
+		});
+	  } else if (gameType === "rpsls") {
+		rpsRadios.forEach((radio) => {
+		  radio.style.display = "inline";
+		});
+		rpslsRadios.forEach((radio) => {
+		  radio.style.display = "inline";
+		});
+	  }
+	} else {
+	  chooseMoveText.innerHTML = ``;
+	  rpsRadios.forEach((radio) => {
+		radio.style.display = "none";
+	  });
+	  rpslsRadios.forEach((radio) => {
+		radio.style.display = "none";
+	  });
+	}
+  }
+  
+  // This function clears the input form and also resets the shot selection
+  // radio buttons.
+  function startOver() {
+	document.getElementById("game type").reset();
+	document.getElementById("rps").checked = true;
+	document.getElementById("rock").checked = true;
+	showHideShots();
+  
+	const resultElement = document.getElementById("game-result");
+	resultElement.innerHTML = "";
+  }
+  
+  async function playGame() {
+	const rps = document.getElementById("rps").checked;
+	const opponent = document.getElementById("opponent").checked;
+	let endpoint = rps ? "/app/rps/play" : "/app/rpsls/play";
+	const shot = document.querySelector('input[name="shot"]:checked').value;
+	const method = opponent ? "POST" : "GET";
+  
+	const options = {
+	  method: method,
+	  headers: {
+		"Content-Type": "application/json",
+	  },
+	};
+  
+	if (method === "POST") {
+	  options.body = JSON.stringify({ shot: shot });
+	} else {
+	  endpoint += `?shot=${shot}`;
+	}
+  
+	try {
+	  const response = await fetch(endpoint, options);
+	  const result = await response.json();
+	  console.log(result);
+  
+	  // Display the result to the user
+	  const resultElement = document.getElementById("game-result");
+	  resultElement.innerHTML = `
+			<p>Your move: ${result.player}</p>
+			<p>Opponent's move: ${result.opponent}</p>
+			<p>Result: ${result.result}</p>
+		  `;
+	} catch (error) {
+	  console.error("Error:", error);
+	}
+  }
+  
