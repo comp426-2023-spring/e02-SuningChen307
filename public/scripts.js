@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // This function clears the input form and also resets the shot selection
   // radio buttons.
   function startOver() {
-	document.getElementById("game type").reset();
+	document.getElementById("game_type").reset();
 	document.getElementById("rps").checked = true;
 	document.getElementById("rock").checked = true;
 	showHideShots();
